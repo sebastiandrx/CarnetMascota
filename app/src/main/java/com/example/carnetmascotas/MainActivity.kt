@@ -9,7 +9,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.carnetmascotas.items.Formulario
 import com.example.carnetmascotas.items.Carnet
+import com.example.carnetmascotas.items.ListaCarnets
 import com.example.carnetmascotas.items.MascotaViewModel
+import com.example.carnetmascotas.items.ListaCarnets
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,6 +28,14 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("carnet") {
                     Carnet(viewModel = viewModel)
+                }
+
+                composable("lista") {
+                    ListaCarnets(navController = navController, viewModel = viewModel)
+                }
+                composable("formulario/{indexEditar}") { backStackEntry ->
+                    val indexEditar = backStackEntry.arguments?.getString("indexEditar")?.toIntOrNull()
+                    Formulario(navController = navController, viewModel = viewModel, indexEditar = indexEditar)
                 }
             }
         }

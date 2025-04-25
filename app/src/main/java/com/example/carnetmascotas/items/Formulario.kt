@@ -2,7 +2,9 @@ package com.example.carnetmascotas.items
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,12 +18,21 @@ import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Formulario(navController: NavController, viewModel: MascotaViewModel) {
-    var nombre by remember { mutableStateOf("") }
-    var raza by remember { mutableStateOf("") }
-    var tamano by remember { mutableStateOf("") }
-    var edad by remember { mutableStateOf("") }
-    var fotoUrl by remember { mutableStateOf("") }
+fun Formulario(
+    navController: NavController,
+    viewModel: MascotaViewModel,
+    indexEditar: Int? = null
+) {
+    val isEditing = indexEditar != null
+    val mascotaAEditar = indexEditar?.let { viewModel.mascotas.getOrNull(it) }
+    val scrollState = rememberScrollState()
+    var showError by remember { mutableStateOf(false) } // 🔧 Agregado para corregir el error
+
+    var nombre by remember { mutableStateOf(mascotaAEditar?.nombre ?: "") }
+    var raza by remember { mutableStateOf(mascotaAEditar?.raza ?: "") }
+    var tamano by remember { mutableStateOf(mascotaAEditar?.tamano ?: "") }
+    var edad by remember { mutableStateOf(mascotaAEditar?.edad ?: "") }
+    var fotoUrl by remember { mutableStateOf(mascotaAEditar?.fotoUrl ?: "") }
 
     Box(
         modifier = Modifier
@@ -42,26 +53,37 @@ fun Formulario(navController: NavController, viewModel: MascotaViewModel) {
                 .align(Alignment.Center)
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                modifier = Modifier
+                    .padding(24.dp)
+                    .fillMaxWidth()
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Registrar Mascota",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
+                    text = if (isEditing) "Editar Mascota" else "Registrar Mascota",
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.ExtraBold,
                     color = Color(0xFF0288D1),
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
+
+                val fieldModifier = Modifier
+                    .fillMaxWidth()
+                    .height(58.dp)
+
+                val borderColorFocused = Color(0xFF03A9F4)
+                val borderColorUnfocused = Color(0xFFB0BEC5)
 
                 OutlinedTextField(
                     value = nombre,
                     onValueChange = { nombre = it },
                     label = { Text("Nombre") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
+                    modifier = fieldModifier,
+                    shape = RoundedCornerShape(14.dp),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = Color(0xFF03A9F4),
-                        unfocusedBorderColor = Color.Gray
+                        focusedBorderColor = borderColorFocused,
+                        unfocusedBorderColor = borderColorUnfocused,
+                        focusedLabelColor = borderColorFocused
                     )
                 )
 
@@ -69,11 +91,12 @@ fun Formulario(navController: NavController, viewModel: MascotaViewModel) {
                     value = raza,
                     onValueChange = { raza = it },
                     label = { Text("Raza") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
+                    modifier = fieldModifier,
+                    shape = RoundedCornerShape(14.dp),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = Color(0xFF03A9F4),
-                        unfocusedBorderColor = Color.Gray
+                        focusedBorderColor = borderColorFocused,
+                        unfocusedBorderColor = borderColorUnfocused,
+                        focusedLabelColor = borderColorFocused
                     )
                 )
 
@@ -81,11 +104,12 @@ fun Formulario(navController: NavController, viewModel: MascotaViewModel) {
                     value = tamano,
                     onValueChange = { tamano = it },
                     label = { Text("Tamaño") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
+                    modifier = fieldModifier,
+                    shape = RoundedCornerShape(14.dp),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = Color(0xFF03A9F4),
-                        unfocusedBorderColor = Color.Gray
+                        focusedBorderColor = borderColorFocused,
+                        unfocusedBorderColor = borderColorUnfocused,
+                        focusedLabelColor = borderColorFocused
                     )
                 )
 
@@ -93,11 +117,12 @@ fun Formulario(navController: NavController, viewModel: MascotaViewModel) {
                     value = edad,
                     onValueChange = { edad = it },
                     label = { Text("Edad") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
+                    modifier = fieldModifier,
+                    shape = RoundedCornerShape(14.dp),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = Color(0xFF03A9F4),
-                        unfocusedBorderColor = Color.Gray
+                        focusedBorderColor = borderColorFocused,
+                        unfocusedBorderColor = borderColorUnfocused,
+                        focusedLabelColor = borderColorFocused
                     )
                 )
 
@@ -105,30 +130,72 @@ fun Formulario(navController: NavController, viewModel: MascotaViewModel) {
                     value = fotoUrl,
                     onValueChange = { fotoUrl = it },
                     label = { Text("URL de Foto") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
+                    modifier = fieldModifier,
+                    shape = RoundedCornerShape(14.dp),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
-                        focusedBorderColor = Color(0xFF03A9F4),
-                        unfocusedBorderColor = Color.Gray
+                        focusedBorderColor = borderColorFocused,
+                        unfocusedBorderColor = borderColorUnfocused,
+                        focusedLabelColor = borderColorFocused
                     )
                 )
 
-                Button(
-                    onClick = {
-                        viewModel.mascota = Mascota(nombre, raza, tamano, edad, fotoUrl)
-                        navController.navigate("carnet")
-                    },
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF03A9F4))
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = "Registrar",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Button(
+                        onClick = {
+                            navController.popBackStack()
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(54.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF8A65))
+                    ) {
+                        Text(
+                            text = "Cancelar",
+                            color = Color.White,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp
+                        )
+                    }
+
+                    Button(
+                        onClick = {
+                            if (nombre.isNotBlank() && raza.isNotBlank() && tamano.isNotBlank() && edad.isNotBlank() && fotoUrl.isNotBlank()) {
+                                val nuevaMascota = Mascota(nombre, raza, tamano, edad, fotoUrl)
+                                viewModel.agregarMascota(nuevaMascota)
+                                showError = false
+
+                                // Limpiar campos
+                                nombre = ""
+                                raza = ""
+                                tamano = ""
+                                edad = ""
+                                fotoUrl = ""
+
+                                // Ir a lista
+                                navController.navigate("lista")
+                            } else {
+                                showError = true
+                            }
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(54.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF03A9F4))
+                    ) {
+                        Text(
+                            text = "Registrar",
+                            color = Color.White,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp
+                        )
+                    }
                 }
             }
         }
